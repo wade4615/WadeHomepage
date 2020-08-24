@@ -439,7 +439,7 @@ module.exports = content.locals || {};
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! c:\projects\WadeHomepage\frontend\src\styles.scss */"./src/styles.scss");
+module.exports = __webpack_require__(/*! C:\projects\WadeHomepage\src\main\webapp\src\styles.scss */"./src/styles.scss");
 
 
 /***/ })
