@@ -1,6 +1,6 @@
 plugins {
 	id 'org.springframework.boot' version '2.4.0-SNAPSHOT'
-	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 	id 'java'
 	id 'war'
 }
@@ -16,56 +16,19 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.webjars:bootstrap:3.3.4'
+	implementation 'org.webjars:jquery:2.1.4'
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
-	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
 }
 
 test {
 	useJUnitPlatform()
-}
-
-
-def webappDir = "$projectDir/src/main/webapp"
-
-sourceSets {
-	main {
-		resources {
-			srcDirs = ["$webappDir/dist", "$projectDir/src/main/resources"]
-		}
-	}
-}
-
-war.rootSpec.exclude("**/node_modules/**")
-
-processResources {
-	dependsOn "buildAngular"
-}
-
-task buildAngular(type:Exec) {
-	dependsOn "installAngular"
-	workingDir "$webappDir"
-	inputs.dir "$webappDir"
-	group = BasePlugin.BUILD_GROUP
-//	outputs.dir "$webappDir/dist"
-	if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
-		commandLine "ng.cmd", "build"
-	} else {
-		commandLine "ng", "build"
-	}
-}
-
-task installAngular(type:Exec) {
-	workingDir "$webappDir"
-	inputs.dir "$webappDir"
-	group = BasePlugin.BUILD_GROUP
-//	outputs.dir "$webappDir/dist"
-	if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
-		commandLine "npm.cmd", "install", "--no-optional", "--no-shrinkwrap"
-	} else {
-		commandLine "npm", "install", "--no-optional", "--no-shrinkwrap"
-	}
 }

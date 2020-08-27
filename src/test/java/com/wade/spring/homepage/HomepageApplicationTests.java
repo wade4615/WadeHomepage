@@ -1,13 +1,14 @@
 package com.wade.spring.homepage;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-//@SpringBootTest
-class HomepageApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
-
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
+public class HomePageApplicationTests {
+    @Test
+    public void contextLoads() {
+    }
 }
