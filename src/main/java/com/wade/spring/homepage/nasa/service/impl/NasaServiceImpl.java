@@ -2,11 +2,13 @@ package com.wade.spring.homepage.nasa.service.impl;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 import org.joda.time.DateTime;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,7 +18,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.wade.spring.homepage.controllers.HomeController;
 import com.wade.spring.homepage.nasa.service.NasaService;
-import com.wade.spring.homepage.nasa.service.data.Photos;
+import com.wade.spring.homepage.nasa.service.data.neo.NearEarthObjects;
+import com.wade.spring.homepage.nasa.service.data.rover.Photos;
 
 @Service
 public class NasaServiceImpl implements NasaService {
@@ -42,24 +45,19 @@ public class NasaServiceImpl implements NasaService {
 		return body;
 	}
 
-	public Object getNeos() {
-
-		RestTemplate restTemplate = new RestTemplate();
-
+	public NearEarthObjects getNeos() {
 		Date dt = new Date();
 		DateTime dtOrg = new DateTime(dt);
 		DateTime dtPlusOne = dtOrg.plusDays(1);
 		String today = dtPlusOne.toString().substring(0, 10);
 		String date_7daysAfter = dtOrg.plusDays(5).toString().substring(0, 10);
-		String url = "https://api.nasa.gov/neo/rest/v1/feed?start_date=" + today + "&end_date=" + date_7daysAfter + "&api_key=" + getKey();
+		String url = "https://api.nasa.gov/neo/rest/v1/feed?start_date=" + today + "&end_date=" + date_7daysAfter +"&";
 
-		ResponseEntity<JSONObject> response = restTemplate.exchange(url, HttpMethod.GET, null, JSONObject.class);
+		NearEarthObjects detail = getDetail2(url, NearEarthObjects.class);
 
-		JSONObject body = response.getBody();
+		logger.info(detail.toString());
 		
-		logger.info(body.toString());
-		
-		return body;
+		return null;
 	}
 
 	public Photos getMarsPics() {
@@ -77,5 +75,17 @@ public class NasaServiceImpl implements NasaService {
 		url += "api_key=" + getKey();
 		logger.info("getting data from url = "+url);
 		return restTemplate.getForObject(url, result);
+	}
+	
+	public <T> T getDetail2(String url, Class<T> result){
+		RestTemplate restTemplate = new RestTemplate();
+		url += "api_key=" + getKey();
+		logger.info("getting data from url = "+url);
+		
+		ParameterizedTypeReference<T> responseType = new ParameterizedTypeReference<>() {};
+		ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, responseType);
+		
+		//return restTemplate.getForObject(url, result);
+		return responseEntity.getBody();
 	}
 }

@@ -8,7 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.wade.spring.homepage.nasa.service.NasaService;
-import com.wade.spring.homepage.nasa.service.data.Photos;
+import com.wade.spring.homepage.nasa.service.data.neo.NearEarthObjects;
+import com.wade.spring.homepage.nasa.service.data.rover.Photos;
 
 @Controller
 public class HomeController {
@@ -28,9 +29,10 @@ public class HomeController {
     }
 
 	@RequestMapping(value = "/neo")
-    public Object getNeos(){
-        service.getNeos();
-        return "index";
+    public Object getNeos(Model model){
+		NearEarthObjects detail = service.getNeos();
+        model.addAttribute("data", detail);
+        return "neo";
     }
 
 	@RequestMapping(value = "/roverphotos")

@@ -1,4 +1,4 @@
-package com.wade.spring.homepage.nasa.service.data;
+package com.wade.spring.homepage.nasa.service.data.rover;
 
 public class Camera {
 	private long id;
