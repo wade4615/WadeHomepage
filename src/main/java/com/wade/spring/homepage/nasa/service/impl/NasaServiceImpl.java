@@ -5,6 +5,8 @@ import java.util.Date;
 
 import org.joda.time.DateTime;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -12,18 +14,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.wade.spring.homepage.controllers.HomeController;
 import com.wade.spring.homepage.nasa.service.NasaService;
+import com.wade.spring.homepage.nasa.service.data.Photos;
 
 @Service
 public class NasaServiceImpl implements NasaService {
-	public String getKey() {
-		return "";
-	}
+	private final static Logger logger = LoggerFactory.getLogger(HomeController.class);
 
-	public void openBrowser(String url) throws IOException {
-		Runtime rt = Runtime.getRuntime();
-		String url1 = url;
-		rt.exec("open " + url1);
+	public String getKey() {
+		return "Qp2GwywgE325c1xmeGOyGGpKmoKNrD2oVFt8Nto3";
 	}
 
 	public JSONObject getApod() {
@@ -34,12 +34,12 @@ public class NasaServiceImpl implements NasaService {
 		RestTemplate restTemplate = new RestTemplate();
 		HttpEntity<String> request = new HttpEntity<>("", httpHeaders);
 		ResponseEntity<JSONObject> response = restTemplate.exchange(url, HttpMethod.GET, request, JSONObject.class);
-		try {
-			openBrowser(response.getBody().get("url").toString());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return response.getBody();
+
+		JSONObject body = response.getBody();
+		
+		logger.info(body.toString());
+		
+		return body;
 	}
 
 	public Object getNeos() {
@@ -51,21 +51,31 @@ public class NasaServiceImpl implements NasaService {
 		DateTime dtPlusOne = dtOrg.plusDays(1);
 		String today = dtPlusOne.toString().substring(0, 10);
 		String date_7daysAfter = dtOrg.plusDays(5).toString().substring(0, 10);
-		String url = "https://api.nasa.gov/neo/rest/v1/feed?start_date=" + today + "&end_date=" + date_7daysAfter
-				+ "&api_key=" + getKey();
+		String url = "https://api.nasa.gov/neo/rest/v1/feed?start_date=" + today + "&end_date=" + date_7daysAfter + "&api_key=" + getKey();
 
 		ResponseEntity<JSONObject> response = restTemplate.exchange(url, HttpMethod.GET, null, JSONObject.class);
 
-		return response.getBody();
+		JSONObject body = response.getBody();
+		
+		logger.info(body.toString());
+		
+		return body;
 	}
 
-	public Object getMarsPics() {
+	public Photos getMarsPics() {
+		String url = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&camera=fhaz&";
+		
+		Photos detail = getDetail(url, Photos.class);
+
+		logger.info(detail.toString());
+		
+		return detail;
+	}
+	
+	public <T> T getDetail(String url, Class<T> result){
 		RestTemplate restTemplate = new RestTemplate();
-
-		String url = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&camera=fhaz&api_key="
-				+ getKey();
-		ResponseEntity<JSONObject> response = restTemplate.exchange(url, HttpMethod.GET, null, JSONObject.class);
-
-		return response.getBody();
+		url += "api_key=" + getKey();
+		logger.info("getting data from url = "+url);
+		return restTemplate.getForObject(url, result);
 	}
 }
